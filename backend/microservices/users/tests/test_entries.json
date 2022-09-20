@@ -1,0 +1,16 @@
+{
+    "Registration" : [
+        {
+            "first_name" : "k7",
+            "last_name" : "p7",
+            "email" : "k7p7@testing.com",
+            "password" : "123"
+        },
+        {
+            "first_name" : "k8",
+            "last_name" : "p8",
+            "email" : "k8p8@testing.com",
+            "password" : "1234"
+        }
+    ]
+}
