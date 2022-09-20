@@ -1,0 +1,48 @@
+version: "3.3"
+
+services:
+  users:
+    image: govueadmin:2.5
+    volumes:
+      - type: bind
+        source: ./microservices/users
+        target: /go/src/govueadmin/microservices/users
+      - type: bind
+        source: ./framework
+        target: /go/src/govueadmin/framework
+    working_dir: /go/src/govueadmin/microservices/users
+    environment:
+      - PORT=:8399
+      - DB_HOST=mongodb
+      - DB_PORT=27017
+      - DB_USER=root
+      - DB_PASSWORD=Admin@123
+      - DB_NAME=govueadmin_users
+      - ROOT_PATH=/go/src/govueadmin/microservices/users
+      - API_URL=http://localhost:8399
+      - FRONTEND_APP_URL=http://govueadmin.localhost
+      - SECRET_KEY=bda3b7cd3ed966b783ee846176b9eb07
+      - SECRET_KEY_COOKIE=9658c83d13c479a9238355d5d792dd9b
+    networks:
+     - mongonetwork
+    ports:
+      - 8399:8399
+
+  mongodb:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: Admin@123
+    networks:
+     - mongonetwork
+    volumes:
+     - type: volume
+       source: mongodata
+       target: /data/db
+
+volumes:
+  mongodata:
+
+networks:
+  mongonetwork:
