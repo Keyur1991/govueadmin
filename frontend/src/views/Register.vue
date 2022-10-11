@@ -121,21 +121,22 @@ const doRegister = handleSubmit(async (values, actions) => {
     })
     .catch((e) => {
       console.log(e);
-      if (e.status == 422) {
-        if (e.data.first_name) {
-          actions.setFieldError("FirstName", e.data.first_name.join(","));
+      if (e.status == 422 && e.data.errors) {
+
+        if (e.data.errors.first_name) {
+          actions.setFieldError("FirstName", e.data.errors.first_name.join(","));
         }
 
-        if (e.data.last_name) {
-          actions.setFieldError("LastName", e.data.last_name.join(","));
+        if (e.data.errors.last_name) {
+          actions.setFieldError("LastName", e.data.errors.last_name.join(","));
         }
 
-        if (e.data.email) {
-          actions.setFieldError("Email", e.data.email.join(","));
+        if (e.data.errors.email) {
+          actions.setFieldError("Email", e.data.errors.email.join(","));
         }
 
-        if (e.data.password) {
-          actions.setFieldError("Password", e.data.password.join(","));
+        if (e.data.errors.password) {
+          actions.setFieldError("Password", e.data.errors.password.join(","));
         }
       }
     });

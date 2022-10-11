@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"govueadmin/framework/cookie"
 	"govueadmin/framework/jwt"
-	"govueadmin/framework/response"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 // Check if request is authenticated or not
@@ -17,20 +18,20 @@ import (
 // Otherwise it will look for Authorization header
 // and validate that header.
 // Else return invalid json response
-func CheckAuth(h http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func CheckAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
 		var authToken string
 
 		// Extract auth-token cookie from request
-		authCookie, err := r.Cookie("auth-token")
+		authCookie, err := c.Cookie("auth-token")
 
 		if err == nil {
 			// get auth token from cookie
-			authToken, err = GetAuthTokenFromCookie(&w, authCookie.Value)
+			authToken, err = GetAuthTokenFromCookie(authCookie)
 
 			if err != nil {
 				// return Internal server error response
-				response.Json(&w, http.StatusInternalServerError, map[string]string{
+				c.JSON(http.StatusInternalServerError, gin.H{
 					"message": http.StatusText(http.StatusInternalServerError),
 				})
 			}
@@ -38,29 +39,29 @@ func CheckAuth(h http.HandlerFunc) http.HandlerFunc {
 
 		if authToken == "" {
 			// Extract authorization header from request
-			authToken = r.Header.Get("Authorization")
+			authToken = c.GetHeader("Authorization")
 		}
 
 		status := false
 
 		if authToken != "" {
 			// validate authentication token
-			status, err = validateJwtToken(&w, authToken)
+			status, err = validateJwtToken(authToken)
 		}
 
 		if !status {
 			// return Unauthorized response
-			response.Json(&w, http.StatusUnauthorized, map[string]string{
+			c.JSON(http.StatusUnauthorized, gin.H{
 				"message": fmt.Sprintf("%s", err),
 			})
 		}
 
-		h.ServeHTTP(w, r)
-	})
+		c.Next()
+	}
 }
 
 // Get auth token string from cookie
-func GetAuthTokenFromCookie(w *http.ResponseWriter, encodedToken string) (string, error) {
+func GetAuthTokenFromCookie(encodedToken string) (string, error) {
 	var token string
 
 	err := cookie.DecodeCookieString(encodedToken, "auth-token", &token, os.Getenv("SECRET_KEY_COOKIE"))
@@ -69,7 +70,7 @@ func GetAuthTokenFromCookie(w *http.ResponseWriter, encodedToken string) (string
 }
 
 // Validate authorization header
-func validateJwtToken(w *http.ResponseWriter, token string) (bool, error) {
+func validateJwtToken(token string) (bool, error) {
 	// get the original token
 	jwtToken, err := jwt.GetOriginalToken(&token)
 

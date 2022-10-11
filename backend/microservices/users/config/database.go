@@ -1,21 +1,21 @@
 package config
 
 import (
-	"context"
-	"govueadmin/framework/db/mongodb"
+	//"context"
+	"govueadmin/framework/db/mysql"
 	"os"
 
-	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
 )
 
-var Conn *mongo.Client
+var DB *gorm.DB
 
 var Database string
 
-var Ctx context.Context
+//var Ctx context.Context
 
 func DbConnect() {
-	config := &mongodb.Config{
+	config := &mysql.Config{
 		Host:     os.Getenv("DB_HOST"),
 		Port:     os.Getenv("DB_PORT"),
 		User:     os.Getenv("DB_USER"),
@@ -25,5 +25,8 @@ func DbConnect() {
 
 	Database = config.Database
 
-	Conn, Ctx, _ = mongodb.Connect(config)
+	//Conn, Ctx, _ = mongodb.Connect(config)
+	DB, _ = mysql.Connect(config)
+
+	// Run migrations
 }

@@ -2,35 +2,36 @@ package controllers
 
 import (
 	"fmt"
-	"govueadmin/framework/response"
 	"govueadmin/microservices/users/models"
 	"net/http"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/gin-gonic/gin"
 )
 
-func Register(w http.ResponseWriter, r *http.Request) {
+func Register(c *gin.Context) {
 	user := &models.User{}
 
-	if formatRequestRegister(&w, r, user) == nil {
+	if formatRequestRegister(c, user) == nil {
 		return
 	}
 
-	now := primitive.NewDateTimeFromTime(time.Now())
+	now := time.Now()
 	user.CreatedAt, user.UpdatedAt = now, now
 
 	status := http.StatusOK
 	var data interface{}
 
-	if err := models.CreateUser(user); err != nil {
+	if err := user.Create(); err != nil {
 		status = http.StatusInternalServerError
 		data = fmt.Sprintf("%s", err)
 	} else {
 		data = user
 	}
 
-	response.Json(&w, status, data)
+	c.JSON(status, gin.H{
+		"data": data,
+	})
 }
 
 // middleware too many attempts

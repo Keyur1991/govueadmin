@@ -26,6 +26,5 @@ func main() {
 	}
 
 	fmt.Println("Users microservices Listening on port " + PORT)
-	fmt.Println("Incoming here")
 	log.Fatal(srv.ListenAndServe())
 }

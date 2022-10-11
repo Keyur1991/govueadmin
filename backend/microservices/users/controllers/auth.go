@@ -7,7 +7,8 @@ import (
 	"govueadmin/framework/cookie"
 	"govueadmin/framework/jwt"
 	"govueadmin/framework/request"
-	"govueadmin/framework/response"
+
+	//"govueadmin/framework/response"
 	"govueadmin/microservices/users/models"
 	"io"
 	"net/http"
@@ -16,9 +17,12 @@ import (
 	"time"
 
 	JWT "github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"go.mongodb.org/mongo-driver/mongo"
+
+	//"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type LoginRequest struct {
@@ -60,12 +64,12 @@ func SetJwtClaims(fields ...string) *JWT.MapClaims {
   Authenticate user by email & password and returns
   jwt token in cookie response.
 */
-func Login(w http.ResponseWriter, r *http.Request) {
+func Login(c *gin.Context) {
 	// set default http 200 status
 	status := http.StatusOK
 	var message string
 
-	req, err := request.Factory(r)
+	req, err := request.Factory(c.Request)
 
 	// decode json body and populate LoginRequest
 	//err := ParseLoginRequest(r.Body)
@@ -81,7 +85,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 		var user models.User
 
-		if err = models.FindByEmail(&user, email); err != nil && errors.Is(err, mongo.ErrNoDocuments) { // fetch the user information by the email address
+		if err = user.GetByEmail(email); err != nil && errors.Is(err, gorm.ErrRecordNotFound) { // fetch the user information by the email address
 			status = http.StatusUnauthorized
 			message = LOGIN_EMAIL_DONT_EXIST
 		} else {
@@ -89,7 +93,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 				status = http.StatusUnauthorized
 				message = LOGIN_WRONG_PASSWORD
 			} else {
-				uid := user.GetHaxUserId()
+				uid := user.Uid
 				tkn, _ := uuid.NewRandom()
 
 				ch := make(chan bool)
@@ -122,7 +126,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 					status = http.StatusInternalServerError
 					message = LOGIN_CANT_GEN_TOKEN
 				} else {
-					w.Header().Set("Authorization", jwtToken)
+					c.Header("Authorization", jwtToken)
 					// generate an encoded cookie string for the jwt token
 					encoded, err := cookie.EncodeCookieString(&jwtToken, "auth-token", os.Getenv("SECRET_KEY_COOKIE"))
 
@@ -133,15 +137,15 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 						// save encoded jwt token in http cookie
 						message = LOGIN_SUCCESS
-						cookie := &http.Cookie{
-							Name:     "auth-token",
-							Value:    encoded,
-							Path:     "/",
-							HttpOnly: true,
-						}
+						// cookie := &http.Cookie{
+						// 	Name:     "auth-token",
+						// 	Value:    encoded,
+						// 	Path:     "/",
+						// 	HttpOnly: true,
+						// }
 
 						// save user
-						http.SetCookie(w, cookie)
+						c.SetCookie("auth-token", encoded, 0, "/", "/", false, true)
 					}
 				}
 			}
@@ -149,12 +153,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// send response back to the client
-	response.Json(&w, status, map[string]string{
+	c.JSON(status, gin.H{
 		"message": message,
 	})
 }
 
-func GetJwtClaims(r *http.Request) JWT.MapClaims {
+func GetJwtClaims(c *gin.Context) JWT.MapClaims {
 	var token string
 	var mu sync.Mutex
 	var wg sync.WaitGroup
@@ -163,11 +167,11 @@ func GetJwtClaims(r *http.Request) JWT.MapClaims {
 
 	go func() {
 		// Extract auth-token cookie from request
-		authCookie, err := r.Cookie("auth-token")
+		authCookie, err := c.Cookie("auth-token")
 
 		if err == nil {
 			mu.Lock()
-			cookie.DecodeCookieString(authCookie.Value, "auth-token", &token, os.Getenv("SECRET_KEY_COOKIE"))
+			cookie.DecodeCookieString(authCookie, "auth-token", &token, os.Getenv("SECRET_KEY_COOKIE"))
 			mu.Unlock()
 		}
 
@@ -176,7 +180,7 @@ func GetJwtClaims(r *http.Request) JWT.MapClaims {
 
 	go func() {
 		mu.Lock()
-		token = r.Header.Get("Authorization")
+		token = c.GetHeader("Authorization")
 		mu.Unlock()
 		wg.Done()
 	}()
@@ -196,66 +200,61 @@ func GetJwtClaims(r *http.Request) JWT.MapClaims {
 // this call should pass through the middleware
 // if middleware okays request then it should
 // just send details of the logged in user
-func Me(w http.ResponseWriter, r *http.Request) {
+func Me(c *gin.Context) {
 	// fetch the claims of the user
-	claims := GetJwtClaims(r)
+	claims := GetJwtClaims(c)
 
 	user := &models.User{}
 
-	objectId, err := user.GetObjectIdFromHex(claims["user_id"].(string))
+	err := user.Find(claims["user_id"].(string))
 
 	if err != nil {
-		response.Json(&w, http.StatusUnauthorized, map[string]string{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": http.StatusText(http.StatusUnauthorized),
 		})
 		return
 	}
 
-	user.Find(objectId)
-
-	response.Json(&w, http.StatusOK, user)
+	c.JSON(http.StatusOK, user)
 }
 
 // logout user
-func Logout(w http.ResponseWriter, r *http.Request) {
+func Logout(c *gin.Context) {
 	var wg sync.WaitGroup
 
 	wg.Add(2)
 
 	// remove jwt token from cookie
 	go func() {
-		// fetch auth cookie from request
-		cookie := &http.Cookie{
-			Name:     "auth-cookie",
-			Value:    "",
-			Path:     "/",
-			HttpOnly: true,
-			Expires:  time.Unix(0, 0),
-		}
+		// // fetch auth cookie from request
+		// cookie := &http.Cookie{
+		// 	Name:     "auth-cookie",
+		// 	Value:    "",
+		// 	Path:     "/",
+		// 	HttpOnly: true,
+		// 	Expires:  time.Unix(0, 0),
+		// }
 
 		// set cookie in http response
-		http.SetCookie(w, cookie)
+		c.SetCookie("auth-cookie", "", 0, "/", "/", false, true)
 		wg.Done()
 	}()
 
 	// remove jwt token from authorization header
 	go func() {
-		claims := GetJwtClaims(r)
+		claims := GetJwtClaims(c)
 
 		if claims != nil {
-			authToken := &models.AuthToken{
-				UserId:  claims["user_id"].(string),
-				TokenId: claims["token_id"].(string),
-			}
+			authToken := &models.AuthToken{}
 
-			authToken.Delete()
+			authToken.Delete(claims["user_id"].(string), claims["token_id"].(string))
 		}
 		wg.Done()
 	}()
 
 	wg.Wait()
 
-	response.Json(&w, http.StatusOK, map[string]string{
+	c.JSON(http.StatusOK, gin.H{
 		"message": LOGOUT_SUCCESS,
 	})
 

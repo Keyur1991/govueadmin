@@ -1,53 +1,61 @@
 package controllers
 
 import (
-	"encoding/json"
 	"govueadmin/microservices/users/models"
 	"net/http"
 
 	//"github.com/gorilla/mux"
-	"govueadmin/framework/response"
 
+	"govueadmin/framework/request"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func formatRequestRegister(w *http.ResponseWriter, r *http.Request, user *models.User) *models.User {
-	jsonPayload := make(map[string]interface{})
+func formatRequestRegister(c *gin.Context, user *models.User) *models.User {
+	req, err := request.Factory(c.Request)
 
-	json.NewDecoder(r.Body).Decode(&jsonPayload)
-
-	if val, ok := jsonPayload["FirstName"]; ok && val != nil {
-		user.FirstName = jsonPayload["FirstName"].(string)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": http.StatusText(http.StatusInternalServerError),
+		})
+		return nil
 	}
 
-	if val, ok := jsonPayload["LastName"]; ok && val != nil {
-		user.LastName = jsonPayload["LastName"].(string)
-	}
+	req.Parse()
 
-	if val, ok := jsonPayload["Email"]; ok && val != nil {
-		user.Email = jsonPayload["Email"].(string)
-	}
+	user.FirstName = req.Get("FirstName")
+	user.LastName = req.Get("LastName")
+	user.Email = req.Get("Email")
 
-	if val, ok := jsonPayload["Password"]; ok && val != nil {
-		hashed, err := bcrypt.GenerateFromPassword([]byte(jsonPayload["Password"].(string)), bcrypt.MinCost)
+	password := req.Get("Password")
+
+	if password != "" {
+		hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
 		if err != nil {
-			response.Json(w, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": http.StatusText(http.StatusInternalServerError),
+			})
 			return nil
 		}
 		user.Password = string(hashed)
 	}
 
-	validate := validator.New()
-	validate.RegisterValidation("UniqueEmail", user.UniqueEmail)
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("UniqueField", user.UniqueField)
+	}
 
-	err := validate.Struct(user)
+	err = binding.Validator.ValidateStruct(user)
 
 	var data interface{}
 
 	if err != nil {
 		data = user.ValidationMessages(err.(validator.ValidationErrors))
-		response.Json(w, http.StatusUnprocessableEntity, &data)
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"errors": &data,
+		})
 		return nil
 	}
 

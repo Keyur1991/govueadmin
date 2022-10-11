@@ -2,43 +2,33 @@ package middlewares
 
 import (
 	"errors"
-	"govueadmin/framework/response"
 	"govueadmin/microservices/users/controllers"
 	"govueadmin/microservices/users/models"
 	"net/http"
 
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+	//"go.mongodb.org/mongo-driver/mongo"
 )
 
-func Authenticate(h http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		claims := controllers.GetJwtClaims(r)
+func Authenticate() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		claims := controllers.GetJwtClaims(c)
 
 		if claims == nil {
-			response.Json(&w, http.StatusUnauthorized, map[string]string{
-				"message": http.StatusText(http.StatusUnauthorized),
-			})
+			c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 			return
 		}
 
-		authToken := &models.AuthToken{
-			UserId:  claims["user_id"].(string),
-			TokenId: claims["token_id"].(string),
-		}
+		authToken := &models.AuthToken{}
 
-		var value interface{}
+		err := authToken.Find(claims["user_id"].(string), claims["token_id"].(string))
 
-		rec := authToken.Find()
-
-		err := rec.Decode(value)
-
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			response.Json(&w, http.StatusUnauthorized, map[string]string{
-				"message": http.StatusText(http.StatusUnauthorized),
-			})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 			return
 		}
 
-		h.ServeHTTP(w, r)
-	})
+		c.Next()
+	}
 }

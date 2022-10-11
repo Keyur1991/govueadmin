@@ -1,18 +1,18 @@
 package middleware
 
 import (
-	"github.com/rs/cors"
 	"govueadmin/framework/config"
-	"net/http"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
-func Cors(conf *config.Cors) func(http.Handler) http.Handler {
-	return cors.New(cors.Options{
-		AllowedOrigins: conf.AllowedOrigins,
+func Cors(conf *config.Cors) gin.HandlerFunc {
+	return cors.New(cors.Config{
+		AllowOrigins:     conf.AllowedOrigins,
 		AllowCredentials: conf.AllowCredentials,
-		Debug: conf.Debug,
-		AllowedHeaders: conf.AllowedHeaders,
-		ExposedHeaders: conf.ExposedHeaders,
-		AllowedMethods: conf.AllowedMethods,
-	}).Handler
+		AllowHeaders:     conf.AllowedHeaders,
+		ExposeHeaders:    conf.ExposedHeaders,
+		AllowMethods:     conf.AllowedMethods,
+	})
 }
