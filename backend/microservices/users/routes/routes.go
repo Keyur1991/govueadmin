@@ -25,7 +25,17 @@ func Setup() *gin.Engine {
 		u.POST("/auth/login", controllers.Login)
 		u.POST("/auth/logout", controllers.Logout)
 		u.POST("/register", controllers.Register)
-		u.POST("/me", controllers.Me, mw.CheckAuth(), middlewares.Authenticate())
+		u.Use(mw.CheckAuth())
+		u.Use(middlewares.Authenticate())
+		//u.POST("/me", mw.CheckAuth(), middlewares.Authenticate(), controllers.Me)
+		u.POST("/me", controllers.Me)
+
+		ur := u.Group("/roles")
+		ur.POST("/", controllers.CreateRole)
+		ur.PUT("/:id", controllers.UpdateRole)
+		ur.DELETE("/:id", controllers.DeleteRole)
+		ur.GET("/", controllers.GetRoles)
+		ur.GET("/:id", controllers.ViewRole)
 	}
 
 	// r := request.Router(conf)

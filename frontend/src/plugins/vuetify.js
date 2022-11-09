@@ -1,10 +1,18 @@
-// Styles
-import '@mdi/font/css/materialdesignicons.css'
-import 'vuetify/styles'
+import Vue from "vue";
+import Vuetify from "vuetify/lib/framework";
+import '@fortawesome/fontawesome-free/css/all.css'
+import en from '../locale/en';
+import fr from '../locale/fr';
 
-// Vuetify
-import { createVuetify } from 'vuetify'
 
-export default createVuetify(
-  // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
-)
+Vue.use(Vuetify);
+
+export default new Vuetify({
+    icons: {
+        iconfont: "fa",
+    },
+    lang: {
+        locales: { en, fr },
+        current: 'en',
+    },
+});

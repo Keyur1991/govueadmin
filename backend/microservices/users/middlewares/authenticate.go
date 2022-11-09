@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"errors"
+	"fmt"
 	"govueadmin/microservices/users/controllers"
 	"govueadmin/microservices/users/models"
 	"net/http"
@@ -14,9 +15,9 @@ import (
 func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		claims := controllers.GetJwtClaims(c)
-
+		fmt.Println(claims)
 		if claims == nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 			return
 		}
 
@@ -25,7 +26,7 @@ func Authenticate() gin.HandlerFunc {
 		err := authToken.Find(claims["user_id"].(string), claims["token_id"].(string))
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 			return
 		}
 

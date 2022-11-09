@@ -1,1 +1,0 @@
-export const loggedin = state => state.loggedin

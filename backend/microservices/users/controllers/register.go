@@ -1,37 +1,42 @@
 package controllers
 
 import (
-	"fmt"
-	"govueadmin/microservices/users/models"
-	"net/http"
+	"govueadmin/framework/response"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Register(c *gin.Context) {
-	user := &models.User{}
+const (
+	USER_REGISTERED = "Registration successful"
+)
 
-	if formatRequestRegister(c, user) == nil {
+func Register(c *gin.Context) {
+	this := this()
+
+	// format the request
+	if err := this.formatRequestRegister(c); err != nil {
+		response.InternalServerError(c, err)
 		return
 	}
 
-	now := time.Now()
-	user.CreatedAt, user.UpdatedAt = now, now
-
-	status := http.StatusOK
-	var data interface{}
-
-	if err := user.Create(); err != nil {
-		status = http.StatusInternalServerError
-		data = fmt.Sprintf("%s", err)
-	} else {
-		data = user
+	// validate the request
+	if errors := this.validateRegistration(); errors != nil {
+		response.UnprocessableEntity(c, errors)
+		return
 	}
 
-	c.JSON(status, gin.H{
-		"data": data,
-	})
+	// add timestamps to the model
+	now := time.Now()
+	this.user.CreatedAt, this.user.UpdatedAt = now, now
+
+	// insert user into database
+	if err := this.user.Create(); err != nil {
+		response.InternalServerError(c, err)
+		return
+	}
+
+	response.Success(c, USER_REGISTERED, this.user)
 }
 
 // middleware too many attempts

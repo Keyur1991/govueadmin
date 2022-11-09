@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"govueadmin/framework/request"
 	"govueadmin/microservices/users/config"
+	"reflect"
 	"regexp"
 	"time"
 
@@ -36,15 +37,16 @@ func (user *User) ImageMaxSizeAllowed(fl validator.FieldLevel) bool {
 }
 
 func (user *User) UniqueField(fl validator.FieldLevel) bool {
-	db := config.DB.Debug().Where("email = ?", (*user).Email)
+	db := config.DB.Debug().Where("email = ?", fl.Field().String())
 
-	fmt.Println((*user))
-	if (*user).Uid != "" {
-		db = db.Where("uid != ?", (*user).Uid)
+	uid := fl.Top().FieldByName("Uid")
+
+	if uid.Kind() == reflect.String && uid.String() != "" {
+		db = db.Where("uid != ?", uid.String())
 	}
 
 	result := db.Find(&User{})
-
+	fmt.Println(result)
 	return result.RowsAffected == 0
 }
 
@@ -56,8 +58,8 @@ func (user *User) PwdPattern(fl validator.FieldLevel) bool {
 
 func (user *User) ValidationMessages(err validator.ValidationErrors) map[string][]string {
 	Fields := map[string]string{
-		"User.FirstName": "first name",
-		"User.LastName":  "last name",
+		"User.FirstName": "first_name",
+		"User.LastName":  "last_name",
 		"User.Email":     "email",
 		"User.Password":  "password",
 	}

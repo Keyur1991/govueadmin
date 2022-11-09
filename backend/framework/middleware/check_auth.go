@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
 	"govueadmin/framework/cookie"
 	"govueadmin/framework/jwt"
@@ -31,9 +32,10 @@ func CheckAuth() gin.HandlerFunc {
 
 			if err != nil {
 				// return Internal server error response
-				c.JSON(http.StatusInternalServerError, gin.H{
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 					"message": http.StatusText(http.StatusInternalServerError),
 				})
+				return
 			}
 		}
 
@@ -47,13 +49,16 @@ func CheckAuth() gin.HandlerFunc {
 		if authToken != "" {
 			// validate authentication token
 			status, err = validateJwtToken(authToken)
+		} else {
+			err = errors.New("Authentication token not present")
 		}
 
 		if !status {
 			// return Unauthorized response
-			c.JSON(http.StatusUnauthorized, gin.H{
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"message": fmt.Sprintf("%s", err),
 			})
+			return
 		}
 
 		c.Next()

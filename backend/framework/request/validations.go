@@ -6,6 +6,10 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+type ValidationInterface interface {
+	UniqueField(validator.FieldLevel) bool
+}
+
 func ValidationMessages(err *validator.ValidationErrors, fields *map[string]string, messages *map[string]string) map[string][]string {
 	vMessages := make(map[string][]string)
 
