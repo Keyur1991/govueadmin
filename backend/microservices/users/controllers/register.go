@@ -11,7 +11,7 @@ const (
 	USER_REGISTERED = "Registration successful"
 )
 
-func Register(c *gin.Context) {
+func RegisterHandler(c *gin.Context) {
 	this := this()
 
 	// format the request
@@ -38,10 +38,3 @@ func Register(c *gin.Context) {
 
 	response.Success(c, USER_REGISTERED, this.user)
 }
-
-// middleware too many attempts
-// define user model
-// validation of the request via model
-// throw validation messages as error
-// localization of the error messages
-// save the user in the database

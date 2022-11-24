@@ -1,8 +1,69 @@
 version: "3.3"
 
 services:
+  auth:
+    build: 
+      context: .
+      dockerfile: ./microservices/auth/Dockerfile
+    image: govueadmin_auth:1.1
+    network_mode: host
+    volumes:
+      - type: bind
+        source: ./microservices/auth
+        target: /go/src/govueadmin/microservices/auth
+      - type: bind
+        source: ./framework
+        target: /go/src/govueadmin/framework
+    working_dir: /go/src/govueadmin/microservices/auth
+    environment:
+      - PORT=:8390
+      - DB_HOST=localhost
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=Admin@123
+      - DB_NAME=govueadmin_users
+      - ROOT_PATH=/go/src/govueadmin/microservices/auth
+      - API_URL=http://localhost:8390
+      - FRONTEND_APP_URL=http://govueadmin.localhost
+      - SECRET_KEY=bda3b7cd3ed966b783ee846176b9eb07
+      - SECRET_KEY_COOKIE=9658c83d13c479a9238355d5d792dd9b
+    ports:
+      - 8390:8390
+
+  roles:
+    build: 
+      context: .
+      dockerfile: ./microservices/roles/Dockerfile
+    image: govueadmin_roles:1.0
+    network_mode: host
+    volumes:
+      - type: bind
+        source: ./microservices/roles
+        target: /go/src/govueadmin/microservices/roles
+      - type: bind
+        source: ./framework
+        target: /go/src/govueadmin/framework
+    working_dir: /go/src/govueadmin/microservices/roles
+    environment:
+      - PORT=:8391
+      - DB_HOST=localhost
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=Admin@123
+      - DB_NAME=govueadmin_roles
+      - ROOT_PATH=/go/src/govueadmin/microservices/roles
+      - API_URL=http://localhost:8391
+      - FRONTEND_APP_URL=http://govueadmin.localhost
+      - SECRET_KEY=bda3b7cd3ed966b783ee846176b9eb07
+      - SECRET_KEY_COOKIE=9658c83d13c479a9238355d5d792dd9b
+    ports:
+      - 8399:8399
+
   users:
-    image: govueadmin:2.7
+    build: 
+      context: .
+      dockerfile: ./microservices/users/Dockerfile
+    image: govueadmin_users:2.7
     network_mode: host
     volumes:
       - type: bind
@@ -24,26 +85,7 @@ services:
       - FRONTEND_APP_URL=http://govueadmin.localhost
       - SECRET_KEY=bda3b7cd3ed966b783ee846176b9eb07
       - SECRET_KEY_COOKIE=9658c83d13c479a9238355d5d792dd9b
-    # networks:
-    #  - mongonetwork
     ports:
       - 8399:8399
-
-  # mongodb:
-  #   image: mongo
-  #   restart: always
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: root
-  #     MONGO_INITDB_ROOT_PASSWORD: Admin@123
-  #   networks:
-  #    - mongonetwork
-  #   volumes:
-  #    - type: volume
-  #      source: mongodata
-  #      target: /data/db
-
-# volumes:
-#   mongodata:
-
-# networks:
-#   mongonetwork:
+  
+  

@@ -6,5 +6,5 @@ import (
 
 func init() {
 	config.DbConnect()
-	config.DB.Migrator().AutoMigrate(&User{}, &AuthToken{})
+	config.DB.Migrator().AutoMigrate(&User{})
 }

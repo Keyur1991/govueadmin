@@ -6,12 +6,10 @@ import (
 
 type This struct {
 	user models.User
-	role models.Role
 }
 
 func this() *This {
 	return &This{
 		user: models.User{},
-		role: models.Role{},
 	}
 }

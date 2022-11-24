@@ -12,8 +12,6 @@ var DB *gorm.DB
 
 var Database string
 
-//var Ctx context.Context
-
 func DbConnect() {
 	config := &mysql.Config{
 		Host:     os.Getenv("DB_HOST"),
@@ -25,8 +23,5 @@ func DbConnect() {
 
 	Database = config.Database
 
-	//Conn, Ctx, _ = mongodb.Connect(config)
 	DB, _ = mysql.Connect(config)
-
-	// Run migrations
 }
