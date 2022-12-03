@@ -17,18 +17,21 @@ services:
     working_dir: /go/src/govueadmin/microservices/auth
     environment:
       - PORT=:8390
+      - PORT2=:8391
       - DB_HOST=localhost
       - DB_PORT=3306
       - DB_USER=root
       - DB_PASSWORD=Admin@123
       - DB_NAME=govueadmin_users
       - ROOT_PATH=/go/src/govueadmin/microservices/auth
+      - SVC_URL=localhost:8391
       - API_URL=http://localhost:8390
       - FRONTEND_APP_URL=http://govueadmin.localhost
       - SECRET_KEY=bda3b7cd3ed966b783ee846176b9eb07
       - SECRET_KEY_COOKIE=9658c83d13c479a9238355d5d792dd9b
     ports:
       - 8390:8390
+      - 8391:8391
 
   roles:
     build: 

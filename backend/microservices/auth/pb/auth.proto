@@ -8,39 +8,25 @@ service AuthService {
     rpc Me(MeRequest) returns (MeResponse) {}
 }
 
-message MeRequest {}
+message MeRequest {
+    string token = 1;
+}
 
-message MeResponse {}
-
-message RegisterRequest {
-    string email = 1;
-    string password = 2;
-  }
+message User {
+    string uid = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string email = 4;
+    string phone = 5;
+    string address = 6;
+    string is_admin = 7;
+    string is_verified = 8;
+    string created_at = 9;
+    string updated_at = 10;
+}
   
-  message RegisterResponse {
+message MeResponse {
     int64 status = 1;
-    string error = 2;
-  }
-  
-  // Login
-  
-  message LoginRequest {
-    string email = 1;
-    string password = 2;
-  }
-  
-  message LoginResponse {
-    int64 status = 1;
-    string error = 2;
-    string token = 3;
-  }
-  
-  // Validate
-  
-  message ValidateRequest { string token = 1; }
-  
-  message ValidateResponse {
-    int64 status = 1;
-    string error = 2;
-    int64 userId = 3;
-  }
+    string message = 2; 
+    User data = 3;
+}

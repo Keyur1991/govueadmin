@@ -14,7 +14,7 @@ import (
 
 func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		claims := controllers.GetJwtClaims(c)
+		claims := controllers.GetJwtClaims(controllers.ExtractToken(c))
 		fmt.Println(claims)
 		if claims == nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})

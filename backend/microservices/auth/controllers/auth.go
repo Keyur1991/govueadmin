@@ -2,11 +2,15 @@ package controllers
 
 import (
 	//"encoding/json"
+	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"govueadmin/framework/cookie"
 	"govueadmin/framework/jwt"
 	"govueadmin/framework/request"
+	"govueadmin/framework/response"
+	"govueadmin/microservices/auth/pb"
 
 	//"govueadmin/framework/response"
 	"govueadmin/microservices/auth/models"
@@ -158,7 +162,7 @@ func LoginHandler(c *gin.Context) {
 	})
 }
 
-func GetJwtClaims(c *gin.Context) JWT.MapClaims {
+func ExtractToken(c *gin.Context) string {
 	var token string
 	var mu sync.Mutex
 	var wg sync.WaitGroup
@@ -187,9 +191,10 @@ func GetJwtClaims(c *gin.Context) JWT.MapClaims {
 
 	wg.Wait()
 
-	if token == "" {
-		return nil
-	}
+	return token
+}
+
+func GetJwtClaims(token string) JWT.MapClaims {
 
 	jwtToken, _ := jwt.GetOriginalToken(&token)
 
@@ -200,22 +205,57 @@ func GetJwtClaims(c *gin.Context) JWT.MapClaims {
 // this call should pass through the middleware
 // if middleware okays request then it should
 // just send details of the logged in user
-func MeHandler(c *gin.Context) {
+func MeHandler(c *gin.Context, pc pb.AuthServiceClient) {
+	// parse gin context parameters such as auth cookie, authorization headers
+	// to Me Request and that MeRequest should be passed to subsequent calls
+	res, err := pc.Me(context.Background(), &pb.MeRequest{
+		Token: ExtractToken(c),
+	})
+
+	fmt.Println("Error:", err)
+	if err != nil {
+		response.InternalServerError(c, err)
+		return
+	}
+
+	response.Success(c, res.GetMessage(), res.GetData())
+}
+
+func (s *GrpcServer) Me(c context.Context, mr *pb.MeRequest) (*pb.MeResponse, error) {
+	fmt.Println("I am calling from grpc api call")
 	// fetch the claims of the user
-	claims := GetJwtClaims(c)
+	claims := GetJwtClaims(mr.Token)
 
 	user := &models.User{}
 
 	err := user.Find(claims["user_id"].(string))
 
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": http.StatusText(http.StatusUnauthorized),
-		})
-		return
+		return &pb.MeResponse{
+			Status:  http.StatusUnauthorized,
+			Message: http.StatusText(http.StatusUnauthorized),
+			Data:    nil,
+		}, nil
 	}
 
-	c.JSON(http.StatusOK, user)
+	data := &pb.User{
+		Uid:        user.Uid,
+		FirstName:  user.FirstName,
+		LastName:   user.LastName,
+		Email:      user.Email,
+		Phone:      user.Phone,
+		Address:    user.Address,
+		IsAdmin:    user.IsAdmin,
+		IsVerified: user.IsVerified,
+		CreatedAt:  user.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:  user.UpdatedAt.Format(time.RFC3339),
+	}
+
+	return &pb.MeResponse{
+		Status:  http.StatusOK,
+		Message: http.StatusText(http.StatusOK),
+		Data:    data,
+	}, nil
 }
 
 // logout user
@@ -242,7 +282,7 @@ func LogoutHandler(c *gin.Context) {
 
 	// remove jwt token from authorization header
 	go func() {
-		claims := GetJwtClaims(c)
+		claims := GetJwtClaims(ExtractToken(c))
 
 		if claims != nil {
 			authToken := &models.AuthToken{}

@@ -39,6 +39,7 @@ func CheckAuth() gin.HandlerFunc {
 			}
 		}
 
+		fmt.Println("Auth Token: ", authToken)
 		if authToken == "" {
 			// Extract authorization header from request
 			authToken = c.GetHeader("Authorization")

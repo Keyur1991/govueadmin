@@ -25,3 +25,10 @@ func Success(c *gin.Context, message string, data interface{}) {
 		"data":    &data,
 	})
 }
+
+func BadGateway(c *gin.Context, err error) {
+	c.JSON(http.StatusBadGateway, gin.H{
+		"message": http.StatusText(http.StatusBadGateway),
+		"error":   err,
+	})
+}

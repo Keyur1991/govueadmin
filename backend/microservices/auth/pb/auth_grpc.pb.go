@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	"fmt"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -36,6 +37,7 @@ func NewAuthServiceClient(cc grpc.ClientConnInterface) AuthServiceClient {
 func (c *authServiceClient) Me(ctx context.Context, in *MeRequest, opts ...grpc.CallOption) (*MeResponse, error) {
 	out := new(MeResponse)
 	err := c.cc.Invoke(ctx, "/auth.AuthService/Me", in, out, opts...)
+	fmt.Println("Error is :" , err)
 	if err != nil {
 		return nil, err
 	}
@@ -71,6 +73,7 @@ func RegisterAuthServiceServer(s grpc.ServiceRegistrar, srv AuthServiceServer) {
 }
 
 func _AuthService_Me_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	fmt.Println("Incoming here 2")
 	in := new(MeRequest)
 	if err := dec(in); err != nil {
 		return nil, err

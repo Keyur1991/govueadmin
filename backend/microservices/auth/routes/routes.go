@@ -12,6 +12,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type GrpcServer struct{}
+
 func Setup() *gin.Engine {
 	conf := &request.Config{
 		Cors:      config.Cors(),
@@ -20,6 +22,9 @@ func Setup() *gin.Engine {
 
 	r := request.Router(conf)
 
+	svc := &ServiceClient{
+		Client: InitServiceClient(),
+	}
 	u := r.Group("/auth")
 	{
 		u.POST("/login", controllers.LoginHandler)
@@ -27,7 +32,7 @@ func Setup() *gin.Engine {
 		u.Use(mw.CheckAuth())
 		u.Use(middlewares.Authenticate())
 		//u.POST("/me", mw.CheckAuth(), middlewares.Authenticate(), controllers.Me)
-		u.POST("/me", controllers.MeHandler)
+		u.POST("/me", svc.MeHandler)
 	}
 
 	// r := request.Router(conf)
@@ -38,4 +43,8 @@ func Setup() *gin.Engine {
 	// r.HandleFunc("/users/me", middlewares.Authenticate(mw.CheckAuth(controllers.Me))).Methods(http.MethodPost, http.MethodOptions)
 
 	return r
+}
+
+func (svc *ServiceClient) MeHandler(c *gin.Context) {
+	controllers.MeHandler(c, svc.Client)
 }
