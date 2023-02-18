@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"govueadmin/microservices/auth/controllers"
 	"govueadmin/microservices/auth/models"
+	"govueadmin/microservices/common/feat"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +15,7 @@ import (
 
 func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		claims := controllers.GetJwtClaims(controllers.ExtractToken(c))
+		claims := controllers.GetJwtClaims(feat.ExtractToken(c))
 		fmt.Println(claims)
 		if claims == nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})

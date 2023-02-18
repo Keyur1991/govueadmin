@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 )
 
 type Role struct {
@@ -38,7 +39,11 @@ func (role *Role) GetRoles() (roles []Role, err error) {
 }
 
 func (role *Role) Create() error {
-	if err := config.DB.Create(role).Error; err != nil {
+	uid, _ := uuid.NewRandom()
+
+	role.Uid = uid.String()
+
+	if err := config.DB.Debug().Create(role).Error; err != nil {
 		return err
 	}
 
@@ -46,15 +51,24 @@ func (role *Role) Create() error {
 }
 
 func (role *Role) Update(uid string) error {
-	if err := config.DB.Where("Uid = ?", uid).Save(role).Error; err != nil {
+	role.Uid = uid
+	if err := config.DB.Debug().Where("uid = ?", uid).Save(role).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 func (role *Role) Delete(uid string) error {
-	if err := config.DB.Where("Uid = ?", uid).Delete(role).Error; err != nil {
+	if err := config.DB.Where("uid = ?", uid).Delete(role).Error; err != nil {
 		return err
 	}
+	return nil
+}
+
+func (role *Role) Find(id string) (err error) {
+	if err := config.DB.Where("uid = ?", id).First(role).Error; err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -11,6 +11,7 @@ import (
 	"govueadmin/framework/request"
 	"govueadmin/framework/response"
 	"govueadmin/microservices/auth/pb"
+	"govueadmin/microservices/common/feat"
 
 	//"govueadmin/framework/response"
 	"govueadmin/microservices/auth/models"
@@ -35,11 +36,12 @@ type LoginRequest struct {
 }
 
 var lr LoginRequest
+
 var (
-	LOGIN_FAILED                   = "Email or password is incorrect"
-	LOGIN_INTERNAL_ERR_JSON_DECODE = "Invalid request body"
-	LOGIN_EMAIL_DONT_EXIST         = "Account doesn't exist with the email specfied, please create an account then try again to login."
-	LOGIN_WRONG_PASSWORD           = "You have provided wrong password"
+	LOGIN_FAILED                   = "login_failed"
+	LOGIN_INTERNAL_ERR_JSON_DECODE = "login_internal_err_json_decode"
+	LOGIN_EMAIL_DONT_EXIST         = "login_email_dont_exist"
+	LOGIN_WRONG_PASSWORD           = "login_wrong_password"
 	LOGIN_CANT_GEN_TOKEN           = "Unable to generate jwt token"
 	LOGIN_SUCCESS                  = "You have successfully logged in"
 	LOGOUT_SUCCESS                 = "You have successfully logged out"
@@ -162,38 +164,6 @@ func LoginHandler(c *gin.Context) {
 	})
 }
 
-func ExtractToken(c *gin.Context) string {
-	var token string
-	var mu sync.Mutex
-	var wg sync.WaitGroup
-
-	wg.Add(2)
-
-	go func() {
-		// Extract auth-token cookie from request
-		authCookie, err := c.Cookie("auth-token")
-
-		if err == nil {
-			mu.Lock()
-			cookie.DecodeCookieString(authCookie, "auth-token", &token, os.Getenv("SECRET_KEY_COOKIE"))
-			mu.Unlock()
-		}
-
-		wg.Done()
-	}()
-
-	go func() {
-		mu.Lock()
-		token = c.GetHeader("Authorization")
-		mu.Unlock()
-		wg.Done()
-	}()
-
-	wg.Wait()
-
-	return token
-}
-
 func GetJwtClaims(token string) JWT.MapClaims {
 
 	jwtToken, _ := jwt.GetOriginalToken(&token)
@@ -201,15 +171,14 @@ func GetJwtClaims(token string) JWT.MapClaims {
 	return jwt.GetJWTClaims(jwtToken)
 }
 
-// check if user is logged or not
-// this call should pass through the middleware
-// if middleware okays request then it should
-// just send details of the logged in user
+// this is a grpc service client method
+// which invokes grpc service server method
+// returns the response in json format
 func MeHandler(c *gin.Context, pc pb.AuthServiceClient) {
 	// parse gin context parameters such as auth cookie, authorization headers
 	// to Me Request and that MeRequest should be passed to subsequent calls
 	res, err := pc.Me(context.Background(), &pb.MeRequest{
-		Token: ExtractToken(c),
+		Token: feat.ExtractToken(c),
 	})
 
 	fmt.Println("Error:", err)
@@ -282,7 +251,7 @@ func LogoutHandler(c *gin.Context) {
 
 	// remove jwt token from authorization header
 	go func() {
-		claims := GetJwtClaims(ExtractToken(c))
+		claims := GetJwtClaims(feat.ExtractToken(c))
 
 		if claims != nil {
 			authToken := &models.AuthToken{}

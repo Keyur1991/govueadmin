@@ -22,6 +22,7 @@ func Setup() *gin.Engine {
 
 	r := request.Router(conf)
 
+	// create grpc service client
 	svc := &ServiceClient{
 		Client: InitServiceClient(),
 	}
@@ -46,5 +47,6 @@ func Setup() *gin.Engine {
 }
 
 func (svc *ServiceClient) MeHandler(c *gin.Context) {
+	// invokes grpc service client method
 	controllers.MeHandler(c, svc.Client)
 }

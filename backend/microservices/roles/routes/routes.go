@@ -6,8 +6,8 @@ import (
 
 	"govueadmin/framework/request"
 
+	mwauth "govueadmin/microservices/common/middlewares/auth"
 	"govueadmin/microservices/roles/controllers"
-	"govueadmin/microservices/roles/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,7 +23,7 @@ func Setup() *gin.Engine {
 	u := r.Group("/roles")
 	{
 		u.Use(mw.CheckAuth())
-		u.Use(middlewares.Authenticate())
+		u.Use(mwauth.Authenticate())
 		u.POST("/", controllers.CreateRoleHandler)
 		u.PUT("/:id", controllers.UpdateRoleHandler)
 		u.DELETE("/:id", controllers.DeleteRoleHandler)

@@ -8,15 +8,25 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CreateRoleHandler(c *gin.Context) {
-	this := this()
+func (this *This) formatAndValidate(c *gin.Context) bool {
+
 	if err := this.formatRequest(c); err != nil {
 		response.InternalServerError(c, err)
-		return
+		return false
 	}
 
 	if errors := this.validate(); errors != nil {
 		response.UnprocessableEntity(c, errors)
+		return false
+	}
+
+	return true
+}
+
+func CreateRoleHandler(c *gin.Context) {
+	this := this()
+
+	if !this.formatAndValidate(c) {
 		return
 	}
 
@@ -32,11 +42,40 @@ func CreateRoleHandler(c *gin.Context) {
 }
 
 func UpdateRoleHandler(c *gin.Context) {
+	this := this()
 
+	if !this.formatAndValidate(c) {
+		return
+	}
+
+	uid := c.Params.ByName("id")
+
+	if err := this.role.Find(uid); err != nil {
+		response.NotFound(c, err)
+		return
+	}
+
+	this.role.UpdatedAt = time.Now()
+
+	if err := this.role.Update(uid); err != nil {
+		response.InternalServerError(c, err)
+		return
+	}
+
+	response.Success(c, "Role successfully created", this.role)
 }
 
 func DeleteRoleHandler(c *gin.Context) {
+	this := this()
 
+	uid := c.Params.ByName("id")
+
+	if err := this.role.Delete(uid); err != nil {
+		response.InternalServerError(c, err)
+		return
+	}
+
+	response.Success(c, "Role successfully deleted", nil)
 }
 
 func ViewRoleHandler(c *gin.Context) {

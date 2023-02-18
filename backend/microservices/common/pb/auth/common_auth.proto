@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "./govueadmin/microservices/common/pb/auth";
+
+service AuthService {
+    rpc Me(AuthRequest) returns (AuthResponse) {}
+}
+
+message AuthRequest {
+    string token = 1;
+}
+
+message AuthResponse {
+    int64 status = 1;
+    string message = 2;
+}

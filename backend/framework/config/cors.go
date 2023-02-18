@@ -1,10 +1,10 @@
 package config
 
 type Cors struct {
-	AllowedOrigins []string
+	AllowedOrigins   []string
 	AllowCredentials bool
-	Debug bool
-	AllowedHeaders []string
-	ExposedHeaders []string
-	AllowedMethods []string
+	Debug            bool
+	AllowedHeaders   []string
+	ExposedHeaders   []string
+	AllowedMethods   []string
 }

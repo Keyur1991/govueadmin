@@ -32,3 +32,16 @@ func BadGateway(c *gin.Context, err error) {
 		"error":   err,
 	})
 }
+
+func AbortWithStatusJSON(c *gin.Context) {
+	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+		"message": http.StatusText(http.StatusUnauthorized),
+	})
+}
+
+func NotFound(c *gin.Context, err error) {
+	c.JSON(http.StatusNotFound, gin.H{
+		"message": http.StatusText(http.StatusNotFound),
+		"error":   err,
+	})
+}
