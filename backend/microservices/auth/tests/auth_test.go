@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"govueadmin/microservices/auth/routes"
+	"app/microservices/auth/routes"
 	"io"
 	"net/http"
 	"net/http/httptest"

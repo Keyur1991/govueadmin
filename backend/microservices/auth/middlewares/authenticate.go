@@ -3,9 +3,9 @@ package middlewares
 import (
 	"errors"
 	"fmt"
-	"govueadmin/microservices/auth/controllers"
-	"govueadmin/microservices/auth/models"
-	"govueadmin/microservices/common/feat"
+	"app/microservices/auth/controllers"
+	"app/microservices/auth/models"
+	"app/microservices/common/feat"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

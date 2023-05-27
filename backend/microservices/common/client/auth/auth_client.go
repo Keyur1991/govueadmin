@@ -2,7 +2,7 @@ package auth
 
 import (
 	"fmt"
-	pbauth "govueadmin/microservices/common/pb/auth"
+	pbauth "app/microservices/common/pb/auth"
 	"os"
 
 	"google.golang.org/grpc"

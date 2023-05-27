@@ -1,13 +1,14 @@
 package middlewares
 
 import (
-	"govueadmin/microservices/roles/client"
+	"app/microservices/roles/client"
 	"net/http"
 
+	"app/microservices/common/feat"
+	"app/microservices/roles/pb"
 	"context"
-	"govueadmin/framework/response"
-	"govueadmin/framework/utils"
-	"govueadmin/microservices/roles/pb"
+
+	"github.com/Keyur1991/go-shreeva/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,7 +21,7 @@ func Authenticate() gin.HandlerFunc {
 		}
 
 		res, err := pc.CheckAuthenticate(context.Background(), &pb.MeRequest{
-			Token: utils.ExtractToken(c),
+			Token: feat.ExtractToken(c),
 		})
 
 		if err != nil {

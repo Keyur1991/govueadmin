@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"govueadmin/microservices/auth/models"
-	"govueadmin/microservices/auth/pb"
+	"app/microservices/auth/models"
+	"app/microservices/auth/pb"
 )
 
 type GrpcServer struct {

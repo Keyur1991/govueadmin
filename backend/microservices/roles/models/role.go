@@ -1,8 +1,8 @@
 package models
 
 import (
-	"govueadmin/framework/request"
-	"govueadmin/microservices/roles/config"
+	"github.com/Keyur1991/go-shreeva/request"
+	"app/microservices/roles/config"
 	"time"
 
 	"github.com/go-playground/validator/v10"

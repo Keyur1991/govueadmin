@@ -1,11 +1,11 @@
 package routes
 
 import (
-	"govueadmin/microservices/users/config"
+	"app/microservices/users/config"
 
-	"govueadmin/framework/request"
+	"github.com/Keyur1991/go-shreeva/request"
 
-	"govueadmin/microservices/users/controllers"
+	"app/microservices/users/controllers"
 
 	"github.com/gin-gonic/gin"
 )

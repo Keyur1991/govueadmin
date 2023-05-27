@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"govueadmin/microservices/users/models"
+	"app/microservices/users/models"
 )
 
 type This struct {

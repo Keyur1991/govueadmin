@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"govueadmin/microservices/auth/controllers"
-	"govueadmin/microservices/auth/pb"
-	"govueadmin/microservices/auth/routes"
+	"app/microservices/auth/controllers"
+	"app/microservices/auth/pb"
+	"app/microservices/auth/routes"
 	"log"
 	"net"
 	"net/http"
@@ -34,7 +34,7 @@ func main() {
 
 		pb.RegisterAuthServiceServer(grpc, &controllers.GrpcServer{})
 
-		fmt.Println("Auth Grpc Listening on port " + PORT2)
+		fmt.Println("Auth Grpc Listening on port 456 " + PORT2)
 		if err := grpc.Serve(lis); err != nil {
 			log.Fatalln("Failed to serve:", err)
 		}

@@ -6,15 +6,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"govueadmin/framework/cookie"
-	"govueadmin/framework/jwt"
-	"govueadmin/framework/request"
-	"govueadmin/framework/response"
-	"govueadmin/microservices/auth/pb"
-	"govueadmin/microservices/common/feat"
+	"app/microservices/auth/pb"
+	"app/microservices/common/feat"
 
-	//"govueadmin/framework/response"
-	"govueadmin/microservices/auth/models"
+	"github.com/Keyur1991/go-shreeva/cookie"
+	"github.com/Keyur1991/go-shreeva/jwt"
+	"github.com/Keyur1991/go-shreeva/request"
+	"github.com/Keyur1991/go-shreeva/response"
+
+	//"github.com/Keyur1991/go-shreeva/response"
+	"app/microservices/auth/models"
 	"io"
 	"net/http"
 	"os"
@@ -48,7 +49,7 @@ var (
 )
 
 /*
-  Parse the login request into struct
+Parse the login request into struct
 */
 func ParseLoginRequest(body io.ReadCloser) error {
 
@@ -56,7 +57,7 @@ func ParseLoginRequest(body io.ReadCloser) error {
 }
 
 /*
-  Set JWT claims options of user model
+Set JWT claims options of user model
 */
 func SetJwtClaims(fields ...string) *JWT.MapClaims {
 	return &JWT.MapClaims{
@@ -67,8 +68,8 @@ func SetJwtClaims(fields ...string) *JWT.MapClaims {
 }
 
 /*
-  Authenticate user by email & password and returns
-  jwt token in cookie response.
+Authenticate user by email & password and returns
+jwt token in cookie response.
 */
 func LoginHandler(c *gin.Context) {
 	// set default http 200 status

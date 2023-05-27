@@ -3,7 +3,7 @@ package config
 import (
 	"os"
 	"net/http"
-	fwconfig "govueadmin/framework/config"
+	fwconfig "github.com/Keyur1991/go-shreeva/config"
 )
 
 func Cors() *fwconfig.Cors {

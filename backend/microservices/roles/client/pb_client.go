@@ -1,8 +1,8 @@
 package client
 
 import (
+	"app/microservices/auth/pb"
 	"fmt"
-	"govueadmin/microservices/roles/pb"
 	"os"
 
 	"google.golang.org/grpc"

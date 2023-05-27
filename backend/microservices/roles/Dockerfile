@@ -1,4 +1,5 @@
-FROM govueadmin_base:1.1
-RUN mkdir -p /go/src/govueadmin/microservices/roles
-COPY ./microservices/roles/ /go/src/govueadmin/microservices/roles/
-RUN go mod tidy -compat=1.17
+FROM app-base:1.0
+RUN mkdir -p /go/src/app/microservices/roles
+COPY ./microservices/roles/ /go/src/app/microservices/roles/
+WORKDIR /go/src/app
+CMD ["go", "run", "./microservices/roles/main.go"]

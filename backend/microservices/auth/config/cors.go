@@ -1,7 +1,7 @@
 package config
 
 import (
-	fwconfig "govueadmin/framework/config"
+	fwconfig "github.com/Keyur1991/go-shreeva/config"
 	"net/http"
 	"os"
 )

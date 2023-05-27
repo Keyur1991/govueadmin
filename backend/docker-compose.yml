@@ -5,96 +5,33 @@ services:
     build: 
       context: .
       dockerfile: ./microservices/auth/Dockerfile
-    image: govueadmin_auth:1.3
+    image: app-auth:1.0
     container_name: auth-service
-    network_mode: host
     volumes:
-      - ./microservices/auth:/go/src/govueadmin/microservices/auth
-      - ./microservices/common/feat:/go/src/govueadmin/microservices/common/feat
-      - ./framework:/go/src/govueadmin/framework
-      - ./microservices/auth/.air.toml:/go/src/govueadmin/.air.toml
-      - ./build.sh:/go/src/govueadmin/build.sh
-    working_dir: /go/src/govueadmin
-    command: "./build.sh"
-    environment:
-      - PORT=:8390
-      - PORT2=:8391
-      - DB_HOST=localhost
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASSWORD=Admin@123
-      - DB_NAME=govueadmin_users
-      - ROOT_PATH=/go/src/govueadmin/microservices/auth
-      - SVC_URL=localhost:8391
-      - API_URL=http://localhost:8390
-      - FRONTEND_APP_URL=http://govueadmin.localhost
-      - SECRET_KEY=bda3b7cd3ed966b783ee846176b9eb07
-      - SECRET_KEY_COOKIE=9658c83d13c479a9238355d5d792dd9b
-    ports:
-      - 8390:8390
-      - 8391:8391
-
+      - ./microservices/auth:/go/src/app/microservices/auth
+      - ./microservices/common/feat:/go/src/app/microservices/common/feat
+      - ./framework:/go/src/app/framework
+      
   roles:
     build: 
       context: .
       dockerfile: ./microservices/roles/Dockerfile
-    image: govueadmin_roles:1.3
+    image: app-roles:1.0
     container_name: roles-service
-    network_mode: host
     volumes:
-      - ./microservices/roles:/go/src/govueadmin/microservices/roles
-      - ./microservices/common/client/auth:/go/src/govueadmin/microservices/common/client/auth
-      - ./microservices/common/feat:/go/src/govueadmin/microservices/common/feat
-      - ./microservices/common/pb/auth:/go/src/govueadmin/microservices/common/pb/auth
-      - ./microservices/common/middlewares/auth:/go/src/govueadmin/microservices/common/middlewares/auth
-      - ./framework:/go/src/govueadmin/framework
-      - ./microservices/roles/.air.toml:/go/src/govueadmin/.air.toml
-      - ./build.sh:/go/src/govueadmin/build.sh
-    working_dir: /go/src/govueadmin
-    command: "./build.sh"
-    environment:
-      - PORT=:8392
-      - DB_HOST=localhost
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASSWORD=Admin@123
-      - DB_NAME=govueadmin_roles
-      - ROOT_PATH=/go/src/govueadmin/microservices/roles
-      - API_URL=http://localhost:8392
-      - AUTH_SVC_URL=localhost:8391
-      - FRONTEND_APP_URL=http://govueadmin.localhost
-      - SECRET_KEY=bda3b7cd3ed966b783ee846176b9eb07
-      - SECRET_KEY_COOKIE=9658c83d13c479a9238355d5d792dd9b
-    ports:
-      - 8392:8392
+      - ./microservices/roles:/go/src/app/microservices/roles
+      - ./microservices/common/client/auth:/go/src/app/microservices/common/client/auth
+      - ./microservices/common/feat:/go/src/app/microservices/common/feat
+      - ./microservices/common/pb/auth:/go/src/app/microservices/common/pb/auth
+      - ./microservices/common/middlewares/auth:/go/src/app/microservices/common/middlewares/auth
+      - ./framework:/go/src/app/framework
 
   users:
     build: 
       context: .
       dockerfile: ./microservices/users/Dockerfile
-    image: govueadmin_users:2.7
-    network_mode: host
+    image: app-users:1.0
     volumes:
-      - ./microservices/users:/go/src/govueadmin/microservices/users
-      - ./microservices/common:/go/src/govueadmin/microservices/common
-      - ./framework:/go/src/govueadmin/framework
-      - ./microservices/users/.air.toml:/go/src/govueadmin/.air.toml
-      - ./build.sh:/go/src/govueadmin/build.sh
-    working_dir: /go/src/govueadmin
-    command: "./build.sh"
-    environment:
-      - PORT=:8399
-      - DB_HOST=localhost
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASSWORD=Admin@123
-      - DB_NAME=govueadmin_users
-      - ROOT_PATH=/go/src/govueadmin/microservices/users
-      - API_URL=http://localhost:8399
-      - FRONTEND_APP_URL=http://govueadmin.localhost
-      - SECRET_KEY=bda3b7cd3ed966b783ee846176b9eb07
-      - SECRET_KEY_COOKIE=9658c83d13c479a9238355d5d792dd9b
-    ports:
-      - 8399:8399
-  
-  
+      - ./microservices/users:/go/src/app/microservices/users
+      - ./microservices/common:/go/src/app/microservices/common
+      - ./framework:/go/src/app/framework

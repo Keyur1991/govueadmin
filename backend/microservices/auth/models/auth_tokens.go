@@ -1,7 +1,7 @@
 package models
 
 import (
-	"govueadmin/microservices/auth/config"
+	"app/microservices/auth/config"
 	"time"
 )
 

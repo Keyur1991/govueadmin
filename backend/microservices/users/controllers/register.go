@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"govueadmin/framework/response"
+	"github.com/Keyur1991/go-shreeva/response"
 	"time"
 
 	"github.com/gin-gonic/gin"

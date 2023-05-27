@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package auth;
 
-option go_package = "./govueadmin/microservices/auth/pb";
+option go_package = "./app/microservices/auth/pb";
 
 service AuthService {
     rpc Me(MeRequest) returns (MeResponse) {}

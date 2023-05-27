@@ -1,7 +1,7 @@
 package models
 
 import (
-	"govueadmin/microservices/users/config"
+	"app/microservices/users/config"
 )
 
 func init() {

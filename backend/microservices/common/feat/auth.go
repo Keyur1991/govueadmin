@@ -1,7 +1,7 @@
 package feat
 
 import (
-	"govueadmin/framework/cookie"
+	"github.com/Keyur1991/go-shreeva/cookie"
 	"os"
 	"sync"
 

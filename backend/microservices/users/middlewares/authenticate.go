@@ -3,8 +3,8 @@ package middlewares
 import (
 	"errors"
 	"fmt"
-	"govueadmin/microservices/users/controllers"
-	"govueadmin/microservices/users/models"
+	"app/microservices/users/controllers"
+	"app/microservices/users/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

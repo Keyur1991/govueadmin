@@ -2,7 +2,7 @@ package routes
 
 import (
 	"fmt"
-	"govueadmin/microservices/auth/pb"
+	"app/microservices/auth/pb"
 	"os"
 
 	"google.golang.org/grpc"

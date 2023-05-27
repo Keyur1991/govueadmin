@@ -2,7 +2,7 @@ package config
 
 import (
 	//"context"
-	"govueadmin/framework/db/mysql"
+	"github.com/Keyur1991/go-shreeva/db/mysql"
 	"os"
 
 	"gorm.io/gorm"

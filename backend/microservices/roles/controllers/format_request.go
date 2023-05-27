@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"govueadmin/framework/request"
+	"github.com/Keyur1991/go-shreeva/request"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"

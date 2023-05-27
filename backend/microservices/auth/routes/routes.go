@@ -1,13 +1,13 @@
 package routes
 
 import (
-	mw "govueadmin/framework/middleware"
-	"govueadmin/microservices/auth/config"
+	mw "github.com/Keyur1991/go-shreeva/middleware"
+	"app/microservices/auth/config"
 
-	"govueadmin/framework/request"
+	"github.com/Keyur1991/go-shreeva/request"
 
-	"govueadmin/microservices/auth/controllers"
-	"govueadmin/microservices/auth/middlewares"
+	"app/microservices/auth/controllers"
+	"app/microservices/auth/middlewares"
 
 	"github.com/gin-gonic/gin"
 )

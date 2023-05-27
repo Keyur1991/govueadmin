@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"govueadmin/microservices/roles/models"
+	"app/microservices/roles/models"
 )
 
 type This struct {

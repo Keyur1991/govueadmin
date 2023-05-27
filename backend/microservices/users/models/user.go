@@ -2,8 +2,8 @@ package models
 
 import (
 	"fmt"
-	"govueadmin/framework/request"
-	"govueadmin/microservices/users/config"
+	"github.com/Keyur1991/go-shreeva/request"
+	"app/microservices/users/config"
 	"reflect"
 	"regexp"
 	"time"

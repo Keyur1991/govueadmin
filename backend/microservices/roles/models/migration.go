@@ -1,7 +1,7 @@
 package models
 
 import (
-	"govueadmin/microservices/roles/config"
+	"app/microservices/roles/config"
 )
 
 func init() {
